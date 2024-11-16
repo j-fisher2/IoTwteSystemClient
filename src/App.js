@@ -6,9 +6,11 @@ import PercentageBar from "./percentageBar";
 
 async function fetchFillData() {
   const response = await fetch(
-    process.env.REACT_APP_FILL_SENSOR
+    'http://localhost:3001/fill-level-data' //process.env.REACT_APP_FILL_SENSOR
   );
+  console.log(response);
   const data = await response.json(); 
+  console.log(data);
   return data;
 }
 
@@ -25,7 +27,7 @@ async function fetchTempData() {
     process.env.REACT_APP_TEMPERATURE_SENSOR
   );
   const data = await response.json(); 
-  return data;
+  return null;//data;
 }
 
 const convertToEST = (timestamp) => {
@@ -55,19 +57,20 @@ function Feed() {
   const [fillLevelAlertThreshold, setFillLevelThreshold] = useState(10);
   const [loadCellAlertThreshold,setLoadcellThreshold] = useState(100);
 
-  const BIN_HEIGHT = 50
+  const BIN_HEIGHT = 100
 
   useEffect(() => {
     const intervalId = setInterval(async () => {
       try {
-        const [fillData,loadData, tempData] = await Promise.all([fetchFillData(),fetchLoadData(), fetchTempData()]); 
+        const [fillData,loadData, tempData] = await Promise.all([fetchFillData(),fetchTempData() /*fetchLoadData()*/]); 
         setFillLevelData(fillData); 
+        console.log(fillData);
         setLoadCellData(loadData);
         setTempData(tempData);
       } catch (error) {
         console.error('Error fetching data:', error); 
       }
-    }, 1000); 
+    }, 4000); 
 
     // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
@@ -100,17 +103,17 @@ function Feed() {
           <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: '#34495e' }}>
               <div style={{ marginBottom: '10px' }}>
                 <strong style={{ color: '#1abc9c' }}>Timestamp: </strong> 
-                <span style={{ color: '#7f8c8d' }}>{convertToEST(fillLevelData.feeds[0].created_at)}</span>
+                <span style={{ color: '#7f8c8d' }}>{convertToEST(fillLevelData[0].timestamp)}</span>
               </div>
               <div style={{ marginBottom: '10px' }}>
-                <strong style={{ color: '#1abc9c' }}>ID: </strong> 
-                <span style={{ color: '#7f8c8d' }}>{fillLevelData.feeds[0].entry_id}</span>
+                <strong style={{ color: '#1abc9c' }}>Bin ID: </strong> 
+                <span style={{ color: '#7f8c8d' }}>{fillLevelData[0].binID}</span>
               </div>
               <div style={{ marginBottom: '10px' }}>
                 <strong style={{ color: '#1abc9c' }}>Fill: </strong> 
-                <span style={{ color: '#7f8c8d' }}>{(Number(fillLevelData.feeds[0].field1)/BIN_HEIGHT)*100}%</span>
+                <span style={{ color: '#7f8c8d' }}>{((1 - (Number(fillLevelData[0].distance) / BIN_HEIGHT)) * 100).toFixed(2)}%</span>
               </div>
-              <PercentageBar height={fillLevelData.feeds[0].field1} BIN_HEIGHT={BIN_HEIGHT} />
+              <PercentageBar percentage = {((1 - (Number(fillLevelData[0].distance) / BIN_HEIGHT)) * 100).toFixed(2)} />
           </div>
         </div>
       ) : (

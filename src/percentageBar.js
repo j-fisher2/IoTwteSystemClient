@@ -1,14 +1,15 @@
 import React from 'react';
 
-const PercentageBar = ({ height, BIN_HEIGHT }) => {
-  const percentage = Number(height) / BIN_HEIGHT * 100;
+const PercentageBar = ({ percentage }) => {
   let backgroundColor;
-    if (percentage <= 50) {
-    backgroundColor = '#00800';
-    } else if (percentage <= 80) {
-    backgroundColor = '#FFD637';
-    } else {
-    backgroundColor = 'red';
+  console.log(percentage)
+  percentage = Math.min(Number(percentage),100);
+  if (percentage <= 50) {
+    backgroundColor = '#008000';
+  } else if (percentage <= 80) {
+   backgroundColor = '#FFD637';
+  } else {
+      backgroundColor = 'red';
     }
 
   return (
