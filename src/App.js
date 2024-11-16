@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Container, Tab, Tabs } from '@mui/material';
+import { Card, CardContent, Box, AppBar, Toolbar, Typography, Container, Tab, Tabs } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PercentageBar from "./percentageBar";
@@ -33,7 +33,6 @@ async function fetchTempData() {
 const convertToEST = (timestamp) => {
   const date = new Date(timestamp);
   
-  // Convert the date to Eastern Time (EST/EDT)
   const options = {
     timeZone: 'America/New_York', 
     year: 'numeric',
@@ -267,15 +266,24 @@ function Feed({alerts,setAlerts}) {
   );
 }  
 
-function Alerts({alerts}) {
+function Alerts({ alerts }) {
   return (
     <Container>
       <h2>Alerts Tab</h2>
-      <ul>
+      <Box>
         {alerts.map((alert) => (
-          <li key={alert.message}>{alert.message}</li>
+          <Card key={alert.message} sx={{ marginBottom: 2, boxShadow: 3 }}>
+            <CardContent>
+              <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                Alert Message:
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {alert.message}
+              </Typography>
+            </CardContent>
+          </Card>
         ))}
-      </ul>
+      </Box>
     </Container>
   );
 }
