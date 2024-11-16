@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Container, Tab, Tabs } from '@mui/material';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import PercentageBar from "./percentageBar";
 
 
 async function fetchFillData() {
   const response = await fetch(
-    'http://localhost:3001/fill-level-data' //process.env.REACT_APP_FILL_SENSOR
+    process.env.REACT_APP_FILL_SENSOR
   );
-  console.log(response);
   const data = await response.json(); 
-  console.log(data);
   return data;
 }
 
@@ -27,7 +27,7 @@ async function fetchTempData() {
     process.env.REACT_APP_TEMPERATURE_SENSOR
   );
   const data = await response.json(); 
-  return null;//data;
+  return data;
 }
 
 const convertToEST = (timestamp) => {
@@ -49,28 +49,76 @@ const convertToEST = (timestamp) => {
 };
 
 
-function Feed() {
+function Feed({alerts,setAlerts}) {
   const [fillLevelData, setFillLevelData] = useState(null); 
   const [loadCellData, setLoadCellData] = useState(null);
   const [tempData, setTempData] = useState(null);
-  const [tempAlertThreshold, setTempThreshold] = useState(30);
-  const [fillLevelAlertThreshold, setFillLevelThreshold] = useState(10);
+  const [tempAlertThreshold, setTempThreshold] = useState(20);
+  const [fillLevelAlertThreshold, setFillLevelThreshold] = useState(90);
   const [loadCellAlertThreshold,setLoadcellThreshold] = useState(100);
+  const BIN_HEIGHT = 50
 
-  const BIN_HEIGHT = 100
+  const addAlert = (newAlert) => {
+    setAlerts((prevAlerts) => {
+      const exists = prevAlerts.some(alert => alert.id === newAlert.id);
+      if (!exists) {
+        toast.info(`New Alert: ${newAlert.message}`, {
+          position: "top-right",
+          autoClose: 5000, 
+          hideProgressBar: true,
+          closeOnClick: true,
+          draggable: true,
+          pauseOnHover: true,
+        });
+      }
+      return exists ? prevAlerts : [...prevAlerts, newAlert];
+    });
+  };
+
+  const acknowledgeAlert = (id) => {
+    setAlerts((prevAlerts) =>
+      prevAlerts.map((alert) =>
+        alert.id === id ? { ...alert, acknowledged: true } : alert
+      )
+    );
+  };
 
   useEffect(() => {
     const intervalId = setInterval(async () => {
       try {
-        const [fillData,loadData, tempData] = await Promise.all([fetchFillData(),fetchTempData() /*fetchLoadData()*/]); 
+        const [fillData,tempData, loadData] = await Promise.all([fetchFillData(),fetchTempData() /*fetchLoadData()*/]); 
         setFillLevelData(fillData); 
         console.log(fillData);
         setLoadCellData(loadData);
         setTempData(tempData);
+        console.log(tempData);
+
+        const percent =  (1 - (Number(fillData[0].distance) / BIN_HEIGHT))*100;
+        console.log(percent)
+        const temperature = tempData[0].temperature;
+        const fillDataTimestamp = convertToEST(fillData[0].timestamp);
+        const tempTimestamp = convertToEST(tempData[0].timestamp)
+
+        if (percent >= fillLevelAlertThreshold) {
+          addAlert({
+            id: `bin-${fillData[0].binID}-fill-${fillDataTimestamp}`,
+            message: `Bin ${fillData[0].binID} filled to ${percent}% - ${fillDataTimestamp}`,
+            timestamp: convertToEST(fillData[0].timestamp),
+            acknowledged: false,
+          });
+        }
+        if (tempData[0].temperature >= tempAlertThreshold) {
+          addAlert({
+            id: `temp-${tempData[0].TempSensorID}-${tempTimestamp}`,
+            message: `Temperature Sensor ${tempData[0].TempSensorID} reading ${tempData[0].temperature}% - ${tempTimestamp}`,
+            timestamp: new Date(),
+            acknowledged: false,
+          });
+        }
       } catch (error) {
         console.error('Error fetching data:', error); 
       }
-    }, 4000); 
+    }, 2000); 
 
     // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
@@ -189,15 +237,15 @@ function Feed() {
           <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: '#34495e' }}>
               <div style={{ marginBottom: '10px' }}>
                 <strong style={{ color: '#1abc9c' }}>Timestamp: </strong> 
-                <span style={{ color: '#7f8c8d' }}>{convertToEST(fillLevelData.feeds[0].created_at)}</span>
+                <span style={{ color: '#7f8c8d' }}>{convertToEST(tempData[0].timestamp)}</span>
               </div>
               <div style={{ marginBottom: '10px' }}>
                 <strong style={{ color: '#1abc9c' }}>ID: </strong> 
-                <span style={{ color: '#7f8c8d' }}>{fillLevelData.feeds[0].entry_id}</span>
+                <span style={{ color: '#7f8c8d' }}>{tempData[0].TempSensorID}</span>
               </div>
               <div style={{ marginBottom: '10px' }}>
                 <strong style={{ color: '#1abc9c' }}>Temperature: </strong> 
-                <span style={{ color: '#7f8c8d' }}>{fillLevelData.feeds[0].field1}&#176;C</span>
+                <span style={{ color: '#7f8c8d' }}>{tempData[0].temperature}&#176;C</span>
               </div>
           </div>
         </div>
@@ -219,16 +267,21 @@ function Feed() {
   );
 }  
 
-function Alerts() {
+function Alerts({alerts}) {
   return (
     <Container>
       <h2>Alerts Tab</h2>
-      <p>System Alerts</p>
+      <ul>
+        {alerts.map((alert) => (
+          <li key={alert.message}>{alert.message}</li>
+        ))}
+      </ul>
     </Container>
   );
 }
 
 function App() {
+  const [alerts, setAlerts] = useState([]);
   return (
     <Router>
       <div className="App">
@@ -244,10 +297,18 @@ function App() {
             </Tabs>
           </Toolbar>
         </AppBar>
+        <ToastContainer 
+          position="top-right" 
+          autoClose={5000} 
+          hideProgressBar={true} 
+          closeOnClick 
+          draggable 
+          pauseOnHover 
+        />
 
         <Routes>
-          <Route path="/" element={<Feed />} />
-          <Route path="/alerts" element={<Alerts />} />
+          <Route path="/" element={<Feed alerts={alerts} setAlerts={setAlerts}/>} />
+          <Route path="/alerts" element={<Alerts alerts={alerts}/>} />
         </Routes>
       </div>
     </Router>
