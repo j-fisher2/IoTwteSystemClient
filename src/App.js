@@ -112,7 +112,7 @@ function Feed({alerts,setAlerts}) {
         if (tempData[0].temperature >= tempAlertThreshold) {
           addAlert({
             id: `temp-${tempData[0].TempSensorID}-${tempTimestamp}`,
-            message: `Temperature Sensor ${tempData[0].TempSensorID} reading ${tempData[0].temperature}% - ${tempTimestamp}`,
+            message: `Temperature Sensor ${tempData[0].TempSensorID} reading ${tempData[0].temperature} deg C - ${tempTimestamp}`,
             timestamp: new Date(),
             acknowledged: false,
           });
@@ -120,7 +120,7 @@ function Feed({alerts,setAlerts}) {
         if (Number(loadData[0].load) >= loadCellAlertThreshold) {
           addAlert({
             id: `temp-${loadData[0].loadSensorID}-${loadTimestamp}`,
-            message: `Load Sensor ${loadData[0].loadSensorID} reading ${loadData[0].load}% - ${loadTimestamp}`,
+            message: `Load Sensor ${loadData[0].loadSensorID} reading ${loadData[0].load} kg - ${loadTimestamp}`,
             timestamp: new Date(),
             acknowledged: false,
           });
