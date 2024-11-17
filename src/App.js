@@ -52,10 +52,10 @@ function Feed({alerts,setAlerts}) {
   const [fillLevelData, setFillLevelData] = useState(null); 
   const [loadCellData, setLoadCellData] = useState(null);
   const [tempData, setTempData] = useState(null);
-  const [tempAlertThreshold, setTempThreshold] = useState(20);
-  const [fillLevelAlertThreshold, setFillLevelThreshold] = useState(90);
-  const [loadCellAlertThreshold,setLoadcellThreshold] = useState(100);
-  const BIN_HEIGHT = 50
+  const [tempAlertThreshold, setTempThreshold] = useState(27);
+  const [fillLevelAlertThreshold, setFillLevelThreshold] = useState(80);
+  const [loadCellAlertThreshold,setLoadcellThreshold] = useState(0.05);
+  const BIN_HEIGHT = 18.7
 
   const addAlert = (newAlert) => {
     setAlerts((prevAlerts) => {
@@ -85,18 +85,21 @@ function Feed({alerts,setAlerts}) {
   useEffect(() => {
     const intervalId = setInterval(async () => {
       try {
-        const [fillData,tempData, loadData] = await Promise.all([fetchFillData(),fetchTempData() /*fetchLoadData()*/]); 
+        const [fillData,tempData, loadData] = await Promise.all([fetchFillData(),fetchTempData(),fetchLoadData()]); 
+        console.log(loadData);
         setFillLevelData(fillData); 
         console.log(fillData);
         setLoadCellData(loadData);
         setTempData(tempData);
         console.log(tempData);
+        console.log(loadData)
 
         const percent =  (1 - (Number(fillData[0].distance) / BIN_HEIGHT))*100;
         console.log(percent)
         const temperature = tempData[0].temperature;
         const fillDataTimestamp = convertToEST(fillData[0].timestamp);
         const tempTimestamp = convertToEST(tempData[0].timestamp)
+        const loadTimestamp = convertToEST(loadData[0].timestamp)
 
         if (percent >= fillLevelAlertThreshold) {
           addAlert({
@@ -110,6 +113,14 @@ function Feed({alerts,setAlerts}) {
           addAlert({
             id: `temp-${tempData[0].TempSensorID}-${tempTimestamp}`,
             message: `Temperature Sensor ${tempData[0].TempSensorID} reading ${tempData[0].temperature}% - ${tempTimestamp}`,
+            timestamp: new Date(),
+            acknowledged: false,
+          });
+        }
+        if (Number(loadData[0].load) >= loadCellAlertThreshold) {
+          addAlert({
+            id: `temp-${loadData[0].loadSensorID}-${loadTimestamp}`,
+            message: `Load Sensor ${loadData[0].loadSensorID} reading ${loadData[0].load}% - ${loadTimestamp}`,
             timestamp: new Date(),
             acknowledged: false,
           });
@@ -158,9 +169,9 @@ function Feed({alerts,setAlerts}) {
               </div>
               <div style={{ marginBottom: '10px' }}>
                 <strong style={{ color: '#1abc9c' }}>Fill: </strong> 
-                <span style={{ color: '#7f8c8d' }}>{((1 - (Number(fillLevelData[0].distance) / BIN_HEIGHT)) * 100).toFixed(2)}%</span>
+                <span style={{ color: '#7f8c8d' }}>{Math.max(0,((1 - (Number(fillLevelData[0].distance) / BIN_HEIGHT)) * 100).toFixed(2))}%</span>
               </div>
-              <PercentageBar percentage = {((1 - (Number(fillLevelData[0].distance) / BIN_HEIGHT)) * 100).toFixed(2)} />
+              <PercentageBar percentage = {Math.max(0,((1 - (Number(fillLevelData[0].distance) / BIN_HEIGHT)) * 100).toFixed(2))} />
           </div>
         </div>
       ) : (
@@ -194,15 +205,15 @@ function Feed({alerts,setAlerts}) {
           <div style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', color: '#34495e' }}>
               <div style={{ marginBottom: '10px' }}>
                 <strong style={{ color: '#1abc9c' }}>Timestamp: </strong> 
-                <span style={{ color: '#7f8c8d' }}>{convertToEST(fillLevelData.feeds[0].created_at)}</span>
+                <span style={{ color: '#7f8c8d' }}>{convertToEST(loadCellData[0].timestamp)}</span>
               </div>
               <div style={{ marginBottom: '10px' }}>
                 <strong style={{ color: '#1abc9c' }}>ID: </strong> 
-                <span style={{ color: '#7f8c8d' }}>{fillLevelData.feeds[0].entry_id}</span>
+                <span style={{ color: '#7f8c8d' }}>{loadCellData[0].loadSensorID}</span>
               </div>
               <div style={{ marginBottom: '10px' }}>
                 <strong style={{ color: '#1abc9c' }}>Weight: </strong> 
-                <span style={{ color: '#7f8c8d' }}>{fillLevelData.feeds[0].field1} kg</span>
+                <span style={{ color: '#7f8c8d' }}>{parseFloat(Number(loadCellData[0].load).toFixed(2))} kg</span>
               </div>
           </div>
         </div>
