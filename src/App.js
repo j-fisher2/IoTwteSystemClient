@@ -109,7 +109,7 @@ function Feed({alerts,setAlerts}) {
             acknowledged: false,
           });
         }
-        if (tempData[0].temperature >= tempAlertThreshold) {
+        if (Number(tempData[0].temperature) >= tempAlertThreshold) {
           addAlert({
             id: `temp-${tempData[0].TempSensorID}-${tempTimestamp}`,
             message: `Temperature Sensor ${tempData[0].TempSensorID} reading ${tempData[0].temperature} deg C - ${tempTimestamp}`,
@@ -132,7 +132,7 @@ function Feed({alerts,setAlerts}) {
 
     // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
-  }, []); 
+  }, [fillLevelAlertThreshold, loadCellAlertThreshold, tempAlertThreshold]); 
 
   return (
     <Container style={{
@@ -172,6 +172,16 @@ function Feed({alerts,setAlerts}) {
                 <span style={{ color: '#7f8c8d' }}>{Math.max(0,((1 - (Number(fillLevelData[0].distance) / BIN_HEIGHT)) * 100).toFixed(2))}%</span>
               </div>
               <PercentageBar percentage = {Math.max(0,((1 - (Number(fillLevelData[0].distance) / BIN_HEIGHT)) * 100).toFixed(2))} />
+              <div style={{ marginTop: '10px' }}>
+              <label htmlFor="fill-level-threshold" style={{ color: '#1abc9c' }}>Set Fill Level Alert Threshold (%):</label>
+              <input 
+                type="number" 
+                id="fill-level-threshold" 
+                value={fillLevelAlertThreshold} 
+                onChange={(e) => {console.log('New Fill Level Threshold:', e.target.value); setFillLevelThreshold(Number(e.target.value))} }
+                style={{ marginLeft: '10px', padding: '5px', borderRadius: '4px', border: '1px solid #ccc', width: '80px' }}
+              />
+            </div>
           </div>
         </div>
       ) : (
@@ -215,6 +225,16 @@ function Feed({alerts,setAlerts}) {
                 <strong style={{ color: '#1abc9c' }}>Weight: </strong> 
                 <span style={{ color: '#7f8c8d' }}>{parseFloat(Number(loadCellData[0].load).toFixed(2))} kg</span>
               </div>
+              <div style={{ marginTop: '10px' }}>
+              <label htmlFor="fill-level-threshold" style={{ color: '#1abc9c' }}>Set Load Cell Alert Threshold (kg):</label>
+              <input 
+                type="number" 
+                id="loade-cell-threshold" 
+                value={loadCellAlertThreshold} 
+                onChange={(e) => setLoadcellThreshold(Number(e.target.value))} 
+                style={{ marginLeft: '10px', padding: '5px', borderRadius: '4px', border: '1px solid #ccc', width: '80px' }}
+              />
+            </div>
           </div>
         </div>
       ) : (
@@ -257,6 +277,16 @@ function Feed({alerts,setAlerts}) {
                 <strong style={{ color: '#1abc9c' }}>Temperature: </strong> 
                 <span style={{ color: '#7f8c8d' }}>{tempData[0].temperature}&#176;C</span>
               </div>
+              <div style={{ marginTop: '10px' }}>
+              <label htmlFor="fill-level-threshold" style={{ color: '#1abc9c' }}>Set Temperature Alert Threshold (&#176;C):</label>
+              <input 
+                type="number" 
+                id="temp-threshold" 
+                value={tempAlertThreshold} 
+                onChange={(e) => setTempThreshold(Number(e.target.value))} 
+                style={{ marginLeft: '10px', padding: '5px', borderRadius: '4px', border: '1px solid #ccc', width: '80px' }}
+              />
+            </div>
           </div>
         </div>
       ) : (
@@ -295,6 +325,15 @@ function Alerts({ alerts }) {
           </Card>
         ))}
       </Box>
+    </Container>
+  );
+}
+
+function Settings({}) {
+  return (
+    <Container>
+      <h2>Settings</h2>
+      
     </Container>
   );
 }
