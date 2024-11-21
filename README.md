@@ -1,0 +1,1 @@
+Part of IoT driven sensory data collection system - work-in-progress frontend responsible for recieving updates from sensory data APIs
