@@ -6,13 +6,7 @@ import {
   Link,
   useLocation,
 } from "react-router-dom";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Tab,
-  Tabs,
-} from "@mui/material";
+import { AppBar, Toolbar, Typography, Tab, Tabs } from "@mui/material";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "leaflet/dist/leaflet.css";
@@ -20,12 +14,7 @@ import Login from "./login";
 import { Logout } from "./utils";
 import Home from "./home";
 import { GarbageBins, BinDetails } from "./bins";
-import {
-  GarbageTrucks,
-  TruckDetails,
-  SelectTruck,
-  RoutePage,
-} from "./trucks";
+import { GarbageTrucks, TruckDetails, SelectTruck, RoutePage } from "./trucks";
 import { Residents } from "./residents";
 
 function App() {
