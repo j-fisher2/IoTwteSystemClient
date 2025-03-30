@@ -15,7 +15,7 @@ const PercentageBar = ({ percentage }) => {
   return (
     <div
       style={{
-        width: "500px",
+        width: "100%",
         borderRadius: "5px",
         height: "30px",
         border: "1px solid black",
