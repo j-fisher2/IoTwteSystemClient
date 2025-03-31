@@ -61,6 +61,8 @@ export default function Home() {
             flexDirection: "column",
             justifyContent: "space-between",
             alignItems: "center",
+            border: "2px solid #1abc9c",
+            borderRadius: "5px"
           }}
         >
           <img
@@ -81,6 +83,8 @@ export default function Home() {
             flexDirection: "column",
             justifyContent: "space-between",
             alignItems: "center",
+            border: "2px solid #1abc9c",
+            borderRadius: "5px"
           }}
         >
           <img
@@ -101,6 +105,8 @@ export default function Home() {
             flexDirection: "column",
             justifyContent: "space-between",
             alignItems: "center",
+            border: "2px solid #1abc9c",
+            borderRadius: "5px"
           }}
         >
           <img id="resident" src="/resident1.png" style={{ width: "110%" }} />
