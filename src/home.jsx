@@ -62,7 +62,8 @@ export default function Home() {
             justifyContent: "space-between",
             alignItems: "center",
             border: "2px solid #1abc9c",
-            borderRadius: "5px"
+            borderRadius: "5px",
+            backgroundColor: "#FFFDD0",
           }}
         >
           <img
@@ -84,7 +85,8 @@ export default function Home() {
             justifyContent: "space-between",
             alignItems: "center",
             border: "2px solid #1abc9c",
-            borderRadius: "5px"
+            borderRadius: "5px",
+            backgroundColor: "#FDFBD4",
           }}
         >
           <img
@@ -106,7 +108,8 @@ export default function Home() {
             justifyContent: "space-between",
             alignItems: "center",
             border: "2px solid #1abc9c",
-            borderRadius: "5px"
+            borderRadius: "5px",
+            backgroundColor: "#FDFBD4",
           }}
         >
           <img id="resident" src="/resident1.png" style={{ width: "110%" }} />

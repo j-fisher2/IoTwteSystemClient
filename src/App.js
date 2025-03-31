@@ -28,11 +28,10 @@ function App() {
       {!isRootPath && (
         <AppBar position="static">
           <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1, flexShrink: 1 }}>
               WTE Management
             </Typography>
-            <Tabs value={0} sx={{ "& .MuiTab-root": { color: "white" } }}>
-              <Tab label="Alerts" component={Link} to="/alerts" />
+            <Tabs sx={{ "& .MuiTab-root": { color: "white" } }}>
               <Tab label="Home" component={Link} to="/home" />
               <Tab label="Logout" component={Link} to="/logout" />
             </Tabs>
