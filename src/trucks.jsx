@@ -170,7 +170,7 @@ export function TruckDetails() {
           <div style={{ marginBottom: "10px" }}>
             <strong style={{ color: "#1abc9c" }}>Weight Reading: </strong>
             <span style={{ color: "#7f8c8d" }}>
-              {Number(fillWeightData[0]?.load)}
+              {Number(fillWeightData[0]?.load)} kg
             </span>
           </div>
           <div style={{ marginBottom: "10px" }}>
